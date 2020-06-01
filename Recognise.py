@@ -6,6 +6,10 @@ import time
 from PIL import Image
 
 class Recognition():
+    """
+    This class works with the rasppi camera inorder to do simple recognision of
+    faces or play a certian song when the person is seen."""
+
     def __init__(self):
         self.threshold = 70
         self.names = [None]+self.getnames()
@@ -15,14 +19,19 @@ class Recognition():
     def addsound():
         person = input('\n Please enter the name of the person you would like to add the audio for ==> ')
         #if person in self.names and self.sounds:
-        
+
         else:
             print('\n That person is not in the data base')
+    """
+
+    """
+    Names of people are stored in a file. This function adds new faces to the
+    list or recognisable faces.
     """
     def addface(self):
         name = input('\n Please enter the name of the new face and press return ==>  ')
         if self.updatenames(name)==True:
-            """collecting data"""
+            #collecting data
             numsamples = 100
             cam = cv2.VideoCapture(0)
             cam.set(3, 640) # set video width
@@ -38,7 +47,7 @@ class Recognition():
                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 faces = face_detector.detectMultiScale(gray, 1.3, 5)
                 for (x,y,w,h) in faces:
-                    cv2.rectangle(img, (x,y), (x+w,y+h), (255,0,0), 2)     
+                    cv2.rectangle(img, (x,y), (x+w,y+h), (255,0,0), 2)
                     count += 1
                     # Save the captured image into the datasets folder
                     cv2.imwrite("dataset/User." + str(face_id) + '.' + str(count) + ".jpg", gray[y:y+h,x:x+w])
@@ -52,9 +61,9 @@ class Recognition():
             print("\n [INFO] Exiting Program and cleanup stuff")
             cam.release()
             cv2.destroyAllWindows()
-            
+
             """Training new face"""
-            
+
             path = 'dataset'
             recognizer = cv2.face.LBPHFaceRecognizer_create()
             #function to get the images and label data
@@ -66,7 +75,7 @@ class Recognition():
             # Print the numer of faces trained and end program
             print("\n [INFO] {0} faces trained. Exiting Program".format(len(np.unique(ids))))
             print(name+"'s face is ready for recognition!")
-    
+
     def schedcallrecognise(self,people, maxcalls=1):
         print('Scheduled recognition running')
         self.killthread = False
@@ -103,8 +112,8 @@ class Recognition():
             ret, img =cam.read()
             img = cv2.flip(img, -1) # Flip vertically
             gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-            
-            faces = faceCascade.detectMultiScale( 
+
+            faces = faceCascade.detectMultiScale(
                 gray,
                 scaleFactor = 1.2,
                 minNeighbors = 5,
@@ -113,14 +122,14 @@ class Recognition():
             for(x,y,w,h) in faces:
                 cv2.rectangle(img, (x,y), (x+w,y+h), (0,255,0), 2)
                 id, confidence = recognizer.predict(gray[y:y+h,x:x+w])
-                # Check if confidence is less them 100 ==> "0" is perfect match 
+                # Check if confidence is less them 100 ==> "0" is perfect match
                 if (confidence < self.threshold):
                     present[id] = True
                     certify[id]+=1
                     idnum = id
                     id = self.names[id]
                     confidence = "  {0}%".format(round(100 - confidence))
-                    
+
                     if time.perf_counter()-timeholder[idnum]>10 and certify[idnum]>8:
                         if seen[idnum] == False and id in people and beencalled[id]==False:
                             numcalled[id]+=1
@@ -130,21 +139,21 @@ class Recognition():
                             self.playsound(self.sounds[idnum])
                             seen[idnum] = True
                         timeholder[idnum] = time.perf_counter()
-                    
+
                 else:
                     id = "unknown"
                     confidence = "  {0}%".format(round(100 - confidence))
-                
+
                 cv2.putText(img, str(id), (x+5,y-5), font, 1, (255,255,255), 2)
-                cv2.putText(img, str(confidence), (x+5,y+h-5), font, 1, (255,255,0), 1)  
-            
+                cv2.putText(img, str(confidence), (x+5,y+h-5), font, 1, (255,255,0), 1)
+
             for i in range(1,len(present)):
                 if present[i] == False:
                     seen[i] = False
                 present[i] = False
-                
 
-            cv2.imshow('camera',img) 
+
+            cv2.imshow('camera',img)
             k = cv2.waitKey(10) & 0xff # Press 'ESC' for exiting video
             if k == 27:
                 break
@@ -154,7 +163,7 @@ class Recognition():
         cv2.destroyAllWindows()
         self.killthread = True
         print('Scheduled Recognition finished')
-        
+
     def callrecognise(self):
         recognizer = cv2.face.LBPHFaceRecognizer_create()
         recognizer.read('trainer/trainer.yml')
@@ -183,8 +192,8 @@ class Recognition():
             ret, img =cam.read()
             img = cv2.flip(img, -1) # Flip vertically
             gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-            
-            faces = faceCascade.detectMultiScale( 
+
+            faces = faceCascade.detectMultiScale(
                 gray,
                 scaleFactor = 1.2,
                 minNeighbors = 5,
@@ -193,7 +202,7 @@ class Recognition():
             for(x,y,w,h) in faces:
                 cv2.rectangle(img, (x,y), (x+w,y+h), (0,255,0), 2)
                 id, confidence = recognizer.predict(gray[y:y+h,x:x+w])
-                # Check if confidence is less them 100 ==> "0" is perfect match 
+                # Check if confidence is less them 100 ==> "0" is perfect match
                 if (confidence < self.threshold):
                     present[id] = True
                     certify[id]+=1
@@ -206,21 +215,21 @@ class Recognition():
                             self.playsound(self.sounds[idnum])
                             seen[idnum] = True
                         timeholder[idnum] = time.perf_counter()
-                    
+
                 else:
                     id = "unknown"
                     confidence = "  {0}%".format(round(100 - confidence))
-                
+
                 cv2.putText(img, str(id), (x+5,y-5), font, 1, (255,255,255), 2)
-                cv2.putText(img, str(confidence), (x+5,y+h-5), font, 1, (255,255,0), 1)  
-            
+                cv2.putText(img, str(confidence), (x+5,y+h-5), font, 1, (255,255,0), 1)
+
             for i in range(1,len(present)):
                 if present[i] == False:
                     seen[i] = False
                 present[i] = False
-                
 
-            cv2.imshow('camera',img) 
+
+            cv2.imshow('camera',img)
             k = cv2.waitKey(10) & 0xff # Press 'ESC' for exiting video
             if k == 27:
                 break
@@ -248,8 +257,8 @@ class Recognition():
             ret, img =cam.read()
             img = cv2.flip(img, -1) # Flip vertically
             gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-            
-            faces = faceCascade.detectMultiScale( 
+
+            faces = faceCascade.detectMultiScale(
                 gray,
                 scaleFactor = 1.2,
                 minNeighbors = 5,
@@ -259,18 +268,18 @@ class Recognition():
                 cv2.rectangle(img, (x,y), (x+w,y+h), (0,255,0), 2)
                 id, confidence = recognizer.predict(gray[y:y+h,x:x+w])
                 print(id)
-                # Check if confidence is less them 100 ==> "0" is perfect match 
+                # Check if confidence is less them 100 ==> "0" is perfect match
                 if (confidence < self.threshold):
                     id = self.names[id]
                     confidence = "  {0}%".format(round(100 - confidence))
                 else:
                     id = "unknown"
                     confidence = "  {0}%".format(round(100 - confidence))
-                
+
                 cv2.putText(img, str(id), (x+5,y-5), font, 1, (255,255,255), 2)
-                cv2.putText(img, str(confidence), (x+5,y+h-5), font, 1, (255,255,0), 1)  
-            
-            cv2.imshow('camera',img) 
+                cv2.putText(img, str(confidence), (x+5,y+h-5), font, 1, (255,255,0), 1)
+
+            cv2.imshow('camera',img)
             k = cv2.waitKey(10) & 0xff # Press 'ESC' for exiting video
             if k == 27:
                 break
@@ -309,10 +318,10 @@ class Recognition():
         pygame.mixer.music.load(sound)
         pygame.mixer.music.play()
         while pygame.mixer.music.get_busy() == True:
-           continue    
+           continue
     def getImagesAndLabels(self,path):
         detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml");
-        imagePaths = [os.path.join(path,f) for f in os.listdir(path)]     
+        imagePaths = [os.path.join(path,f) for f in os.listdir(path)]
         faceSamples=[]
         ids = []
         for imagePath in imagePaths:
