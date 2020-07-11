@@ -336,4 +336,4 @@ class Recognition():
 
 if __name__ == '__main__':
     rec = Recognition()
-    rec.schedcallrecognise(['Nicholas'],2)
+    rec.recognise()
