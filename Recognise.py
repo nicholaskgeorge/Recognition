@@ -11,7 +11,7 @@ class Recognition():
     faces or play a certian song when the person is seen."""
 
     def __init__(self):
-        self.threshold = 70
+        self.threshold = 77
         self.names = [None]+self.getnames()
         self.killthread = False
         self.sounds = [None,'MasterIntro.mp3',None,'Breakemystride.mp3','JennyJenny.mp3',None]
@@ -32,7 +32,7 @@ class Recognition():
         name = input('\n Please enter the name of the new face and press return ==>  ')
         if self.updatenames(name)==True:
             #collecting data
-            numsamples = 100
+            numsamples = 200
             cam = cv2.VideoCapture(0)
             cam.set(3, 640) # set video width
             cam.set(4, 480) # set video height
@@ -336,4 +336,4 @@ class Recognition():
 
 if __name__ == '__main__':
     rec = Recognition()
-    rec.recognise()
+    rec.callrecognise()
