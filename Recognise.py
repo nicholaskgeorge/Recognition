@@ -15,7 +15,7 @@ class Recognition():
         self.threshold = 77
         self.names = [None]+self.getnames()
         self.killthread = False
-        self.sounds = [[],['MasterIntro.mp3'],[],['Breakemystride.mp3'],['JennyJenny.mp3'],[]]
+        self.sounds = [['whothefuckareyou.mp3','icansmellit.mp3','Yourenot.mp3'],['MasterIntro2.mp3'],[],['Breakemystride.mp3'],['Jennajenna.mp3'],[]]
     """
     def addsound():
         person = input('\n Please enter the name of the person you would like to add the audio for ==> ')
@@ -216,9 +216,12 @@ class Recognition():
                 if time.perf_counter()-timeholder[idnum]>10 and certify[idnum]>8:
                     if seen[idnum] == False:
                         certify[idnum]=0
-                        choice = randint(0,len(self.sounds[idnum])-1)
-                        self.playsound(self.sounds[idnum][choice])
                         seen[idnum] = True
+                        try:
+                            choice = randint(0,len(self.sounds[idnum])-1)
+                            self.playsound(self.sounds[idnum][choice])
+                        except:
+                            self.playsound('Noaudio.mp3')
                     timeholder[idnum] = time.perf_counter()
 
                 # else:
