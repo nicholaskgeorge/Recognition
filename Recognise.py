@@ -4,6 +4,7 @@ import os
 import pygame
 import time
 from PIL import Image
+from random import randint
 
 class Recognition():
     """
@@ -14,7 +15,7 @@ class Recognition():
         self.threshold = 77
         self.names = [None]+self.getnames()
         self.killthread = False
-        self.sounds = [None,'MasterIntro.mp3',None,'Breakemystride.mp3','JennyJenny.mp3',None]
+        self.sounds = [None,['MasterIntro.mp3'],None,'Breakemystride.mp3','JennyJenny.mp3',None]
     """
     def addsound():
         person = input('\n Please enter the name of the person you would like to add the audio for ==> ')
@@ -172,8 +173,8 @@ class Recognition():
         font = cv2.FONT_HERSHEY_SIMPLEX
         #iniciate id counter
         id = 0
-        timeholder = ['None']+[0]*(len(self.names)-1)
-        certify=['None']+[0]*(len(self.names)-1)
+        timeholder = [0]*(len(self.names))
+        certify= [0]*(len(self.names))
         # Initialize and start realtime video capture
         cam = cv2.VideoCapture(0)
         cam.set(3, 640) # set video widht
@@ -182,11 +183,11 @@ class Recognition():
         minW = 0.1*cam.get(3)
         minH = 0.1*cam.get(4)
         #seen = False
-        seen = [0]*(len(self.names)-1)
-        present = [0]*(len(self.names)-1)
-        for i in range(len(self.names)-1):
+        seen = [0]*(len(self.names))
+        present = [0]*(len(self.names))
+        for i in range(len(self.names)):
             seen.append(False)
-        for i in range(len(self.names)-1):
+        for i in range(len(self.names)):
             present.append(False)
         while True:
             ret, img =cam.read()
@@ -203,27 +204,31 @@ class Recognition():
                 cv2.rectangle(img, (x,y), (x+w,y+h), (0,255,0), 2)
                 id, confidence = recognizer.predict(gray[y:y+h,x:x+w])
                 # Check if confidence is less them 100 ==> "0" is perfect match
-                if (confidence < self.threshold):
-                    present[id] = True
-                    certify[id]+=1
+                if (confidence > self.threshold):
+                    idnum = 0
+                    id = 'Unknown'
+                else:
                     idnum = id
                     id = self.names[id]
-                    confidence = "  {0}%".format(round(100 - confidence))
-                    if time.perf_counter()-timeholder[idnum]>10 and certify[idnum]>8:
-                        if seen[idnum] == False:
-                            certify[idnum]=0
-                            self.playsound(self.sounds[idnum])
-                            seen[idnum] = True
-                        timeholder[idnum] = time.perf_counter()
+                present[idnum] = True
+                certify[idnum] += 1
+                confidence = "  {0}%".format(round(100 - confidence))
+                if time.perf_counter()-timeholder[idnum]>10 and certify[idnum]>8:
+                    if seen[idnum] == False:
+                        certify[idnum]=0
+                        choice = randint(0,len(self.sounds[idnum])-1)
+                        self.playsound(self.sounds[idnum][choice])
+                        seen[idnum] = True
+                    timeholder[idnum] = time.perf_counter()
 
-                else:
-                    id = "unknown"
-                    confidence = "  {0}%".format(round(100 - confidence))
+                # else:
+                #     id = "unknown"
+                #     confidence = "  {0}%".format(round(100 - confidence))
 
                 cv2.putText(img, str(id), (x+5,y-5), font, 1, (255,255,255), 2)
                 cv2.putText(img, str(confidence), (x+5,y+h-5), font, 1, (255,255,0), 1)
 
-            for i in range(1,len(present)):
+            for i in range(len(present)):
                 if present[i] == False:
                     seen[i] = False
                 present[i] = False
