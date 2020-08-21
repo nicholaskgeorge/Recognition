@@ -15,7 +15,7 @@ class Recognition():
         self.threshold = 77
         self.names = [None]+self.getnames()
         self.killthread = False
-        self.sounds = [None,['MasterIntro.mp3'],None,'Breakemystride.mp3','JennyJenny.mp3',None]
+        self.sounds = [[],['MasterIntro.mp3'],[],['Breakemystride.mp3'],['JennyJenny.mp3'],[]]
     """
     def addsound():
         person = input('\n Please enter the name of the person you would like to add the audio for ==> ')
